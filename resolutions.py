@@ -10,14 +10,14 @@ from PIL import Image
 
 session = Session.builder.configs(st.secrets["geodemo"]).create()
 
-@st.cache_resource
+@st.cache_resource(ttl="2d")
 def get_h3point_df(resolution: float, row_count: int) -> pd.DataFrame:
     return session.sql(
         f"select distinct h3_point_to_cell_string(ST_POINT(UNIFORM( -180 , 180 , random()), UNIFORM( -90 , 90 , random())), {resolution}) as h3 from table(generator(rowCount => {row_count}))"
     ).to_pandas()
 
 
-@st.cache_resource
+@st.cache_resource(ttl="2d")
 def get_coverage_layer(df: pd.DataFrame, line_color: List) -> pdk.Layer:
     return pdk.Layer(
         "H3HexagonLayer",
